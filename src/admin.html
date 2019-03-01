@@ -5,30 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>管理页面</title>
-    <style>
-        *{
-            padding: 0;
-            margin: 0;
-        }
-        #yyy{
-            padding:50px 80px;
-            border-radius: 20px;
-            border:2px dashed #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width:200px;
-            flex-direction: column;
-        }
-    </style>
+    <link rel="stylesheet" href="./css/default.css">
 </head>
 <body>
-    <div id="yyy">
-        <span id="xxx">点击或拖拽上传</span>
-        <p>文件大小不能超过40MB</p>
+    <div class="page">
+        <aside>
+            <div class="newSong">新建歌曲</div>
+            <ul class="songList">
+                <li>歌曲1</li>
+                <li class="active">歌曲2</li>
+                <li>歌曲3</li>
+                <li>歌曲4</li>
+                <li>歌曲5</li>
+                <li>歌曲6</li>
+                
+            </ul>
+            <div class="uploadArea">
+                <div id="uploadContainer" class="draggable">
+                    <div id="uploadButton" class="clickable">
+                        <span>点击或拖拽上传</span>
+                        <p>文件大小不能超过40MB</p>
+                    </div>                  
+                </div>
+            </div>
+        </aside>
+        <main>
+            <h1>新建歌曲</h1>
+            <form class="form">
+                <div class="row">
+                    <label for="">
+                        歌名                       
+                    </label>
+                    <input type="text">
+                </div>
+                <div class="row">
+                    <label for="">
+                        歌手    
+                    </label>
+                    <input type="text">
+                </div>
+                <div class="row">
+                    <label for="">
+                        外链                      
+                    </label>
+                    <input type="text">
+                </div>
+                <div class="row actions">
+                    <button type="submit">保存</button>
+                </div>
+            </form>
+        </main>
     </div>
-    <div id="uploadStatus"></div>
-    <audio controls src="http://pnksng3qv.bkt.clouddn.com/%E5%91%A8%E6%9D%B0%E4%BC%A6%20-%20%E8%9C%97%E7%89%9B.mp3"></audio>
+
+    
+    
     <script src="../node_modules/leancloud-storage/dist/av-min.js"></script>
     <script>
         var APP_ID = 'uopniNrop0QlmICi8TzlqKYO-9Nh9j0Va';
@@ -48,17 +78,17 @@
       //引入Plupload 、qiniu.js1版本后
       var uploader = Qiniu.uploader({
         runtimes: 'html5',    //上传模式,依次退化
-        browse_button: 'xxx',       //上传选择的点选按钮，**必需**
+        browse_button: 'uploadButton',       //上传选择的点选按钮，**必需**
         uptoken_url: 'http://localhost:8888/uptoken',            //Ajax请求upToken的Url，**强烈建议设置**（服务端提供）
         // uptoken : '', //若未指定uptoken_url,则必须指定 uptoken ,uptoken由其他程序生成
         // unique_names: true, // 默认 false，key为文件名。若开启该选项，SDK为自动生成上传成功后的key（文件名）。
         // save_key: true,   // 默认 false。若在服务端生成uptoken的上传策略中指定了 `sava_key`，则开启，SDK会忽略对key的处理
-        domain: 'http://qiniu-plupload.qiniudn.com/',   //bucket 域名，下载资源时用到，**必需**
+        domain: 'pnksng3qv.bkt.clouddn.com',   //bucket 域名，下载资源时用到，**必需**
         get_new_uptoken: false,  //设置上传文件的时候是否每次都重新获取新的token
-        container: 'yyy',           //上传区域DOM ID，默认是browser_button的父元素，
+        container: 'uploadContainer',           //上传区域DOM ID，默认是browser_button的父元素，
         max_file_size: '40mb',           //最大文件体积限制
         dragdrop: true,                   //开启可拖曳上传
-        drop_element: 'yyy',        //拖曳上传区域元素的ID，拖曳文件或文件夹后可触发上传
+        drop_element: 'uploadContainer',        //拖曳上传区域元素的ID，拖曳文件或文件夹后可触发上传
         auto_start: true,                 //选择文件后自动上传，若关闭需要自己绑定事件触发上传
         init: {
             'FilesAdded': function(up, files) {
@@ -74,7 +104,6 @@
                     // 每个文件上传时,处理相关的事情
             },
             'FileUploaded': function(up, file, info) {
-                uploadStatus.textContent='上传完毕'
                     // 每个文件上传成功后,处理相关的事情
                     // 其中 info.response 是文件上传成功后，服务端返回的json，形式如
                     // {
@@ -83,9 +112,10 @@
                     //  }
                     // 参考http://developer.qiniu.com/docs/v6/api/overview/up/response/simple-response.html
 
-                    // var domain = up.getOption('domain');
-                    // var res = parseJSON(info.response);
-                    // var sourceLink = domain + res.key; 获取上传成功后的文件的Url
+                    var domain = up.getOption('domain');
+                    var response = JSON.parse(info.response);
+                    var sourceLink ='http://'+ domain +'/'+ encodeURIComponent(response.key); //获取上传成功后的文件的Url
+                    uploadStatus.textContent=sourceLink + ' ' + response.key
             },
             'Error': function(up, err, errTip) {
                     //上传出错时,处理相关的事情
