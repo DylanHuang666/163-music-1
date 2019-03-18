@@ -92,12 +92,13 @@
                 this.view.render(this.model.data)
             })
             window.eventHub.on('new',(data)=>{
-                if(data===undefined){
+                if(this.model.data.id){
                     this.model.data={
                         name:'',singer:'',url:'',id:''
                     }
-                }
-                this.model.data=data              
+                }else{
+                    Object.assign(this.model.data,data)
+                }              
                 this.view.render(this.model.data)
             })
         },
